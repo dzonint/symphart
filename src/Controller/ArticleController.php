@@ -35,11 +35,11 @@ class ArticleController extends AbstractController {
         $form = $this->createFormBuilder($article)
         ->add('title', TextType::class, ['attr' => ['class' => 'form-control']])
         ->add('body', TextAreaType::class, ['required' => false, 'attr' => ['class' => 'form-control']])
-        ->add('save', SubmitType::class, ['label' => 'Create', 'attr' => ['class' => 'btn btn-primary mt-3']])
+        ->add('save', SubmitType::class, ['label' => 'Update', 'attr' => ['class' => 'btn btn-primary mt-3']])
         ->getForm();
 
         $form->handleRequest($request);
-        if($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $article = $form->getData();
 
             $em = $this->getDoctrine()->getManager();
@@ -50,6 +50,32 @@ class ArticleController extends AbstractController {
         }
 
         return $this->render('articles/new.html.twig', [
+            'form' => $form->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/article/edit/{id}", name="edit_article")
+     * @Method({"GET", "POST"})
+     */
+    public function edit(Request $request, int $id) {
+        $article = $this->getDoctrine()->getRepository(Article::class)->find($id);
+
+        $form = $this->createFormBuilder($article)
+        ->add('title', TextType::class, ['attr' => ['class' => 'form-control']])
+        ->add('body', TextAreaType::class, ['required' => false, 'attr' => ['class' => 'form-control']])
+        ->add('save', SubmitType::class, ['label' => 'Create', 'attr' => ['class' => 'btn btn-primary mt-3']])
+        ->getForm();
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->flush();
+
+            return $this->redirectToRoute('article_list');
+        }
+
+        return $this->render('articles/edit.html.twig', [
             'form' => $form->createView()
         ]);
     }
