@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class ArticleController extends AbstractController {
 
@@ -60,6 +61,21 @@ class ArticleController extends AbstractController {
         $article = $this->getDoctrine()->getRepository(Article::class)->find($id);
 
         return $this->render('articles/show.html.twig', ['article' => $article]);
+    }
+
+    /**
+     * @Route("/article/delete/{id}")
+     * @Method({"DELETE"})
+     */
+    public function delete(Request $request, int $id) {
+        $article = $this->getDoctrine()->getRepository(Article::class)->find($id);
+
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($article);
+        $em->flush();
+
+        $response = new Response();
+        $response->send();
     }
 }
 
